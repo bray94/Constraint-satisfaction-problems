@@ -1,0 +1,8 @@
+Brief Overview of File Structure to ensure uniformity
+
+Package MP2
+    - Puzzle.java
+    - Category.java
+    - puzzle1.txt (along with all other puzzles)
+    - wordlist (folder)
+        - adjective.txt (along with other word source files)
