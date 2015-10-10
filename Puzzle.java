@@ -90,9 +90,7 @@ public class Puzzle
 		catch (FileNotFoundException e)
 		{
 			System.out.println(e.getMessage());
-		}
-		
-		
+		}	
 		
 	}
 	
@@ -120,46 +118,69 @@ public class Puzzle
 				
 				for(String word: wordList)
 				{
-					System.out.print(word+ " ,");
+					System.out.println(word+ " ,");
 				}
-
-				System.out.println();
 			}
 			
 			System.out.println();
 		}
 		
 	}
+	
+	/**
+	 * Finds the category with the least number of words left
+	 * Returns the index of this category in the categoryList
+	 */
+	public int getCategoryWithLowestWords()
+	{
+		int min = 0;
+		int counter = 0;
+		
+		for (Category curr_category : categoryList)
+		{
+			if(curr_category.getNumWords() < categoryList.get(min).getNumWords())
+				min = counter;
+			counter++;
+		}
+		
+		return min;
+	}
 
 	/** 
-	* Method to call recursive algorithm for word based assignment and sets up necessary variables and print
+	* Method to call recursive algorithm for 
+	* word based assignment and sets up necessary variables and print
+	* the solution
 	*/
-	public void runWordBasedAssignment(){
+	public void runWordBasedAssignment()
+	{
 		char[] tempSolution = new char[this.length];
 
-		for(int i = 0; i < this.length ; i++){
+		for(int i = 0; i < this.length ; i++)
+		{
 			tempSolution[i] = ' ';
 		}
 
-		this.wordBasedAssignment(tempSolution, 0 , categoryList);
+		wordBasedAssignment(tempSolution, 0 , categoryList);
 
-		for(int i = 0 ; i < solution.size() ; i++){
+		System.out.println("Solution Size: " + solution.size());
+		
+		//Print the Solution
+		for(int i = 0 ; i < solution.size() ; i++)
+		{
 			System.out.println(solution.get(i));
 		}
 
 	}
-
+	
 	/** 
 	* Runs recursive back-tracing algorithm
 	*/
-
-	public void wordBasedAssignment(char[] tempSolution, int index, ArrayList<Category> sortedCategoryList){
-
-		
+	public void wordBasedAssignment(char[] tempSolution, int index, ArrayList<Category> sortedCategoryList)
+	{	
 		// If solution doesn't contain any blank spaces, it is printed and returned up a level
-		if(!(new String(tempSolution).contains(" "))){
-			//this.solution.add(new String(tempSolution));
-			System.out.println(new String(tempSolution));
+		if(!(new String(tempSolution).contains(" ")))
+		{
+			solution.add(new String(tempSolution));
 			return;
 		}
 
@@ -167,21 +188,25 @@ public class Puzzle
 		ArrayList<Integer> positions = sortedCategoryList.get(index).getPositions();
 
 		// Iterate through words in current category
-		for(String temp_word : sortedCategoryList.get(index).getWordList()){
-			System.out.println(new String(tempSolution));
+		for(String temp_word : sortedCategoryList.get(index).getWordList())
+		{
+			//System.out.println(new String(tempSolution));
 
 			// Check if word meets constraints
-			if(checkConstraints(tempSolution, positions, temp_word)){
+			if(checkConstraints(tempSolution, positions, temp_word))
+			{
 
 				// Finds the places for the current category and enters the current temp_word into that spot
-				for(int i = 0; i < 3 ; i ++ ){
+				for(int i = 0; i < 3 ; i ++ )
+				{
 					tempSolution[positions.get(i) - 1] = temp_word.charAt(i);
 				}
 
-				wordBasedAssignment(tempSolution, index + 1 , sortedCategoryList); // Recursive search to next category with current solution
+				wordBasedAssignment(tempSolution, ((index + 1)%categoryList.size()) , sortedCategoryList); // Recursive search to next category with current solution
 			}
 
-			else{
+			else
+			{
 				continue; // Skips current word since it doesn't work
 			} 
 
@@ -189,17 +214,20 @@ public class Puzzle
 	}
 
 	/** 
-	* Method checks whether the current word fits in to the solution. It will check the positions it goes in to and
+	* Method checks whether the current word fits in to the solution. 
+	* It will check the positions it goes in to and
 	* if the space is blank or has the matching letter
 	*/
-	public static boolean checkConstraints(char[] tempSolution, ArrayList<Integer> positions, String word){
-
-
-		if((word.charAt(0) == tempSolution[positions.get(0)] || tempSolution[positions.get(0)] == ' ')
-			&& (word.charAt(0) == tempSolution[positions.get(0)] || tempSolution[positions.get(0)] == ' ') 
-				&& (word.charAt(0) == tempSolution[positions.get(0)] || tempSolution[positions.get(0)] == ' ')) return true;
-		else return false;
+	public static boolean checkConstraints(char[] tempSolution, ArrayList<Integer> positions, String word)
+	{
+		if((word.charAt(0) == tempSolution[positions.get(0) - 1] || tempSolution[positions.get(0) -1] == ' ')
+			&& (word.charAt(1) == tempSolution[positions.get(1) - 1] || tempSolution[positions.get(1) -1] == ' ') 
+				&& (word.charAt(2) == tempSolution[positions.get(2) - 1] || tempSolution[positions.get(2) -1] == ' ')) 
+			return true;
+		else 
+			return false;
 	}
+
 	
 	/**
 	 * Driver Method to test the above Code
@@ -208,8 +236,7 @@ public class Puzzle
 	public static void main(String [] args)
 	{
 		Puzzle myPuzzle = new Puzzle("src/mp2/puzzle1.txt");
-		myPuzzle.testPuzzleParameters();
-
+		//myPuzzle.testPuzzleParameters();
 		myPuzzle.runWordBasedAssignment();
 	}
 	
