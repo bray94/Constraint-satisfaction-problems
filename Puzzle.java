@@ -137,6 +137,8 @@ public class Puzzle
 	{
 		Puzzle myPuzzle = new Puzzle("src/mp2/puzzle1.txt");
 		myPuzzle.testPuzzleParameters();
+
+		myPuzzle.runWordBasedAssignment();
 	}
 	
 	
