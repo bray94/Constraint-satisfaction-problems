@@ -69,13 +69,6 @@ public class Spots
 		return lettersList.size();
 	}
 	
-	/**
-	 * 
-	 */
-	public void makeLetterList()
-	{
-		// How to do this????
-	}
 
 	// ___________________________________ POSITION CATEGORIES ______________________________
 	
