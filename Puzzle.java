@@ -11,6 +11,11 @@ public class Puzzle
 	 * Stores the categories possible for this maze
 	 */
 	private ArrayList<Category> categoryList;
+
+	/**
+	 * Stores the spots for this maze
+	 */
+	private ArrayList<Spot> spotList;
 	
 	/**
 	 * Stores the number of letters in this maze
@@ -128,23 +133,6 @@ public class Puzzle
 		}
 		
 	}
-
-
-	/** 
-	* Method checks whether the current word fits in to the solution. 
-	* It will check the positions it goes in to and
-	* if the space is blank or has the matching letter
-	*/
-	public static boolean checkConstraints(char[] tempSolution, ArrayList<Integer> positions, String word)
-	{
-		if((word.charAt(0) == tempSolution[positions.get(0) - 1] || tempSolution[positions.get(0) -1] == ' ')
-			&& (word.charAt(1) == tempSolution[positions.get(1) - 1] || tempSolution[positions.get(1) -1] == ' ') 
-				&& (word.charAt(2) == tempSolution[positions.get(2) - 1] || tempSolution[positions.get(2) -1] == ' ')) 
-			return true;
-		else 
-			return false;
-	}
-
 	
 
 	// ___________________________________ Functions for Word Based Assignment __________________________________
@@ -230,7 +218,7 @@ public class Puzzle
 		}
 	}
 
-	
+
 	/**
 	 * Finds the category with the least number of words left
 	 * Returns the index of this category in the categoryList
@@ -273,6 +261,22 @@ public class Puzzle
 		return newList;
 	}
 
+	/** 
+	* Method checks whether the current word fits in to the solution. 
+	* It will check the positions it goes in to and
+	* if the space is blank or has the matching letter
+	*/
+	public static boolean checkConstraintsWordBasedAssignment(char[] tempSolution, ArrayList<Integer> positions, String word)
+	{
+		if((word.charAt(0) == tempSolution[positions.get(0) - 1] || tempSolution[positions.get(0) -1] == ' ')
+			&& (word.charAt(1) == tempSolution[positions.get(1) - 1] || tempSolution[positions.get(1) -1] == ' ') 
+				&& (word.charAt(2) == tempSolution[positions.get(2) - 1] || tempSolution[positions.get(2) -1] == ' ')) 
+			return true;
+		else 
+			return false;
+	}
+
+
 	// ___________________________________ Functions for Letter Based Assignment __________________________________
 
 	/** 
@@ -282,6 +286,9 @@ public class Puzzle
 	*/
 	public void runLetterBasedAssignment()
 	{
+
+		getSpotsFromCategories();
+
 		char[] tempSolution = new char[this.length];
 
 		for(int i = 0; i < this.length ; i++)
@@ -289,10 +296,10 @@ public class Puzzle
 			tempSolution[i] = ' ';
 		}
 
-		ArrayList<Category> sortedSpotList = sortSpotList(); // Needs function for this
+		ArrayList<Spot> sortedSpotList = sortSpotList();
 
 
-		letterBasedAssignment(tempSolution, 0 , sortedCategoryList);
+		letterBasedAssignment(tempSolution, 0 , sortedSpotList);
 
 		System.out.println("Solution Size: " + solution.size());
 		
@@ -310,20 +317,136 @@ public class Puzzle
 	*/
 	public void letterBasedAssignment(char[] tempSolution, int index, ArrayList<Integer> sortedSpotList)
 	{	
+		// If solution doesn't contain any blank spaces, it is printed and returned up a level
+		if(!(new String(tempSolution).contains(" ")))
+		{
+			solution.add(new String(tempSolution));
+			return;
+		}
+
+		// Gets array of categories for current position
+		ArrayList<Category> categories = sortedSpotList.get(index).getCategories();
+
+		// Iterate through letters in current position
+		for(char temp_letter : sortedListList.get(index).getLetterList())
+		{
+			// Check if word meets constraints
+			if(checkConstraints(tempSolution, categories, temp_letter))
+			{
+				char[] newTempSolution = new char[tempSolution.length];
+
+				// Creates new solution to pass recursively
+				for(int i = 0; i < tempSolution.length ; i++)
+				{
+					newTempSolution[i] = tempSolution[i];
+				}
+
+				newTempSolution[index] = temp_letter;
+
+				letterBasedAssignment(newTempSolution, ((index + 1) % sortedLetterList.size()) , sortedLetterList); // Recursive search to next category with current solution
+			}
+
+			else
+			{
+				continue; // Skips current letter since it doesn't work
+			} 
+		}
+	}
+
+	/**
+	 * Finds the spot with the least number of letters left
+	 * Returns the index of this spot in the spotList
+	 */
+	public int getSpotWithLowestLetters()
+	{
+		int min = 0;
+		int counter = 0;
 		
+		for (Spot curr_spot : spotList)
+		{
+			if(curr_spot.getNumLetters() < spotList.get(min).getNumLetters())
+				min = counter;
+			counter++;
+		}
+		
+		return min;
 	}
 
 	/** 
-	* Sorts spots in solution based on amount of categories attached
-	* using the ones with the most amount(the most constraining)
+	* Sorts spots in solution based on amount of letters
+	* using the ones with the least amount(the most constraining)
 	* first
 	*/
-	public ArrayList<Integer> sortSpotList()
+	public ArrayList<Spot> sortSpotList()
 	{
-		ArrayList<Integer> sortedSpotList = new ArrayList<Integer>();
+		ArrayList<Spot> sortedSpotList = new ArrayList<Spot>();
+
+		int minimum;
+
+		int numberOfSpots = spotList.size();
+
+		for(int i = 0; i < numberOfSpots ; i++)
+		{
+			minimum = getSpotWithLowestLetters();
+			sortedSpotList.add(spotList.get(minimum));
+			spotList.remove(minimum);
+		}
 
 		return sortedSpotList;
 	}
+
+	/** 
+	* Method checks whether the current letter fits in to the solution. 
+	* It will check the categories to see if it fits in and
+	* if the space is blank or has the matching letter
+	*/
+	public static boolean checkConstraintsLetterBasedAssignment(char[] tempSolution, ArrayList<Category> categories, char letter)
+	{
+		// NEEDS IMPLIMENTED
+	}
+
+	/** 
+	* Sets the spotList from Categories
+	*/
+	public void getSpotsFromCategories()
+	{
+		Spot spot;
+		ArrayList<Integer> positions;
+
+		// Go through positions to initilize spots
+		for(int i = 1 ; i < length + 1 ; i++){
+
+			// Make new spot with number
+			spot = new Spot();
+			spot.setSpotNumber(i);
+
+			// Look through categories and check whether
+			// it has a letter that matches the position
+			for(Category curr_category : categoryList){
+
+				// Iterate through positions
+				positions = curr_category.getPositions();
+				for(int j = 0; j < 3 ; j++){
+
+					// If position matches
+					if(positions.get(j) == i){
+
+						// Add that letter to this position
+						for(String word : curr_category.getWordList()){
+							spot.addLetter(word.chaAt(j));
+						}
+					}
+
+					// If the position is greater than our spot, break
+					else if(positions.get(j) > i) break;
+				}
+			}
+
+			// Add spot to list
+			spotList.add(spot);
+		}
+
+	}	
 
 // ___________________________________ Main Function __________________________________
 
