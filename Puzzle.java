@@ -34,6 +34,8 @@ public class Puzzle
 		//Make the Actual Maze
 		makePuzzle(filename);
 	}
+
+	// ___________________________________ Constructs Puzzle __________________________________
 	
 	/**
 	 * Makes the Actual Representation of the Puzzle
@@ -126,43 +128,26 @@ public class Puzzle
 		}
 		
 	}
+
+
+	/** 
+	* Method checks whether the current word fits in to the solution. 
+	* It will check the positions it goes in to and
+	* if the space is blank or has the matching letter
+	*/
+	public static boolean checkConstraints(char[] tempSolution, ArrayList<Integer> positions, String word)
+	{
+		if((word.charAt(0) == tempSolution[positions.get(0) - 1] || tempSolution[positions.get(0) -1] == ' ')
+			&& (word.charAt(1) == tempSolution[positions.get(1) - 1] || tempSolution[positions.get(1) -1] == ' ') 
+				&& (word.charAt(2) == tempSolution[positions.get(2) - 1] || tempSolution[positions.get(2) -1] == ' ')) 
+			return true;
+		else 
+			return false;
+	}
+
 	
-	/**
-	 * Finds the category with the least number of words left
-	 * Returns the index of this category in the categoryList
-	 */
-	public int getCategoryWithLowestWords()
-	{
-		int min = 0;
-		int counter = 0;
-		
-		for (Category curr_category : categoryList)
-		{
-			if(curr_category.getNumWords() < categoryList.get(min).getNumWords())
-				min = counter;
-			counter++;
-		}
-		
-		return min;
-	}
 
-	public ArrayList<Category> sortCategoryList()
-	{
-		ArrayList<Category> newList = new ArrayList<Category>();
-
-		int minimum;
-
-		int numberOfCategories = categoryList.size();
-
-		for(int i = 0; i < numberOfCategories ; i++)
-		{
-			minimum = getCategoryWithLowestWords();
-			newList.add(categoryList.get(minimum));
-			categoryList.remove(minimum);
-		}
-		
-		return newList;
-	}
+	// ___________________________________ Functions for Word Based Assignment __________________________________
 
 	/** 
 	* Method to call recursive algorithm for 
@@ -193,39 +178,9 @@ public class Puzzle
 
 	}
 
-	/** 
-	* Method to call recursive algorithm for 
-	* letter based assignment and sets up necessary variables and print
-	* the solution
-	*/
-	public void runLetterBasedAssignment()
-	{
-		char[] tempSolution = new char[this.length];
-
-		for(int i = 0; i < this.length ; i++)
-		{
-			tempSolution[i] = ' ';
-		}
-
-		ArrayList<Category> sortedSpotList;; // Needs function for this
-
-
-		letterBasedAssignment(tempSolution, 0 , sortedCategoryList);
-
-		System.out.println("Solution Size: " + solution.size());
-		
-		//Print the Solution
-		for(int i = 0 ; i < solution.size() ; i++)
-		{
-			System.out.println(solution.get(i));
-		}
-
-	}
-
-
 	
 	/** 
-	* Runs recursive back-tracing algorithm
+	* Runs recursive back-tracing algorithm for word based assignment
 	*/
 	public void wordBasedAssignment(char[] tempSolution, int index, ArrayList<Category> sortedCategoryList)
 	{	
@@ -275,32 +230,103 @@ public class Puzzle
 		}
 	}
 
+	
+	/**
+	 * Finds the category with the least number of words left
+	 * Returns the index of this category in the categoryList
+	 */
+	public int getCategoryWithLowestWords()
+	{
+		int min = 0;
+		int counter = 0;
+		
+		for (Category curr_category : categoryList)
+		{
+			if(curr_category.getNumWords() < categoryList.get(min).getNumWords())
+				min = counter;
+			counter++;
+		}
+		
+		return min;
+	}
+
 	/** 
-	* Runs recursive back-tracing algorithm
+	* Sorts categories based on amount of words 
+	* using the ones with the least amount(the most constraining)
+	* first
 	*/
-	public void letterBasedAssignment(char[] tempSolution, int index, ArrayList<Category> sortedSpotList)
+	public ArrayList<Category> sortCategoryList()
+	{
+		ArrayList<Category> newList = new ArrayList<Category>();
+
+		int minimum;
+
+		int numberOfCategories = categoryList.size();
+
+		for(int i = 0; i < numberOfCategories ; i++)
+		{
+			minimum = getCategoryWithLowestWords();
+			newList.add(categoryList.get(minimum));
+			categoryList.remove(minimum);
+		}
+		
+		return newList;
+	}
+
+	// ___________________________________ Functions for Letter Based Assignment __________________________________
+
+	/** 
+	* Method to call recursive algorithm for 
+	* letter based assignment and sets up necessary variables and print
+	* the solution
+	*/
+	public void runLetterBasedAssignment()
+	{
+		char[] tempSolution = new char[this.length];
+
+		for(int i = 0; i < this.length ; i++)
+		{
+			tempSolution[i] = ' ';
+		}
+
+		ArrayList<Category> sortedSpotList = sortSpotList(); // Needs function for this
+
+
+		letterBasedAssignment(tempSolution, 0 , sortedCategoryList);
+
+		System.out.println("Solution Size: " + solution.size());
+		
+		//Print the Solution
+		for(int i = 0 ; i < solution.size() ; i++)
+		{
+			System.out.println(solution.get(i));
+		}
+
+	}
+
+
+	/** 
+	* Runs recursive back-tracing algorithm for letter based search
+	*/
+	public void letterBasedAssignment(char[] tempSolution, int index, ArrayList<Integer> sortedSpotList)
 	{	
 		
 	}
 
-
-
 	/** 
-	* Method checks whether the current word fits in to the solution. 
-	* It will check the positions it goes in to and
-	* if the space is blank or has the matching letter
+	* Sorts spots in solution based on amount of categories attached
+	* using the ones with the most amount(the most constraining)
+	* first
 	*/
-	public static boolean checkConstraints(char[] tempSolution, ArrayList<Integer> positions, String word)
+	public ArrayList<Integer> sortSpotList()
 	{
-		if((word.charAt(0) == tempSolution[positions.get(0) - 1] || tempSolution[positions.get(0) -1] == ' ')
-			&& (word.charAt(1) == tempSolution[positions.get(1) - 1] || tempSolution[positions.get(1) -1] == ' ') 
-				&& (word.charAt(2) == tempSolution[positions.get(2) - 1] || tempSolution[positions.get(2) -1] == ' ')) 
-			return true;
-		else 
-			return false;
+		ArrayList<Integer> sortedSpotList = new ArrayList<Integer>();
+
+		return sortedSpotList;
 	}
 
-	
+// ___________________________________ Main Function __________________________________
+
 	/**
 	 * Driver Method to test the above Code
 	 * @param args
