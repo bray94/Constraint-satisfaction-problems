@@ -435,6 +435,9 @@ public class Puzzle
 						for(String word : curr_category.getWordList()){
 							spot.addLetter(word.chaAt(j));
 						}
+
+						// Add category to spot
+						spot.addCategory(curr_category);
 					}
 
 					// If the position is greater than our spot, break
