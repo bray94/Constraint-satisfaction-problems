@@ -53,7 +53,7 @@ public class Spots
 	 */
 	public void addLetter(char letter)
 	{
-		letterList.add(letter);
+		if(!letterList.contains(letter)) letterList.add(letter);
 	}
 	
 	/**
@@ -70,11 +70,34 @@ public class Spots
 	}
 	
 	/**
-	 * Reads in Words from a File based on the Category Name
+	 * 
 	 */
 	public void makeLetterList()
 	{
 		// How to do this????
+	}
+
+	// ___________________________________ POSITION CATEGORIES ______________________________
+	
+	/**
+	 * Stores the categories attached to this position
+	 */
+	private ArrayList<Category> categories;
+	
+	/**
+	 * Returns the categories for this position
+	 */
+	public ArrayList<Category> getCategories()
+	{
+		return categories;
+	}
+	
+	/**
+	 * Adds a Category to this Position
+	 */
+	public void addCategory(Category newCategory)
+	{
+		categories.add(newcategory);
 	}
 
 
