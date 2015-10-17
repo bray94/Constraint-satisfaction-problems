@@ -32,7 +32,50 @@ public class Spots
 
 	// ___________________________________ Letter LIST __________________________________
 
+	/**
+	 * Stores the list of letters available each spot
+	 */
+	private ArrayList<Char> letterList;
+	
+	/**
+	 * Constructor
+	 */
+	public Spot()
+	{
+		//Initialize the Letter List and the Categories List
+		letterList = new ArrayList<Char>();
+		categories = new ArrayList<String>();
+	}
+	
+	/**
+	 * Simply adds a letter to the list of letters
+	 * @param word
+	 */
+	public void addLetter(char letter)
+	{
+		letterList.add(letter);
+	}
+	
+	/**
+	 * Returns the list of letters in this position
+	 */
+	public ArrayList<Char> getLetterList()
+	{
+		return letterList;
+	}
 
+	public int getNumLetters()
+	{
+		return lettersList.size();
+	}
+	
+	/**
+	 * Reads in Words from a File based on the Category Name
+	 */
+	public void makeLetterList()
+	{
+		// How to do this????
+	}
 
 
 
