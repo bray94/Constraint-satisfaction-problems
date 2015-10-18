@@ -192,7 +192,7 @@ public class Puzzle
 		*/ 
 
 			// Check if word meets constraints
-			if(checkConstraints(tempSolution, positions, temp_word))
+			if(checkConstraintsWordBasedAssignment(tempSolution, positions, temp_word))
 			{
 				char[] newTempSolution = new char[tempSolution.length];
 
@@ -245,6 +245,7 @@ public class Puzzle
 	*/
 	public ArrayList<Category> sortCategoryList()
 	{
+
 		ArrayList<Category> newList = new ArrayList<Category>();
 
 		int minimum;
@@ -315,7 +316,7 @@ public class Puzzle
 	/** 
 	* Runs recursive back-tracing algorithm for letter based search
 	*/
-	public void letterBasedAssignment(char[] tempSolution, int index, ArrayList<Integer> sortedSpotList)
+	public void letterBasedAssignment(char[] tempSolution, int index, ArrayList<Spot> sortedSpotList)
 	{	
 		// If solution doesn't contain any blank spaces, it is printed and returned up a level
 		if(!(new String(tempSolution).contains(" ")))
@@ -324,32 +325,39 @@ public class Puzzle
 			return;
 		}
 
+		
+
 		// Gets array of categories for current position
 		ArrayList<Category> categories = sortedSpotList.get(index).getCategories();
 
 		// Iterate through letters in current position
-		for(char temp_letter : sortedListList.get(index).getLetterList())
+		for(char temp_letter : sortedSpotList.get(index).getLetterList())
 		{
-			// Check if word meets constraints
-			if(checkConstraints(tempSolution, categories, temp_letter))
-			{
-				char[] newTempSolution = new char[tempSolution.length];
+			boolean flag = true;
 
-				// Creates new solution to pass recursively
-				for(int i = 0; i < tempSolution.length ; i++)
-				{
-					newTempSolution[i] = tempSolution[i];
+			// Check if letter meets constraints
+			for(Category curr_category : categories){
+
+				if(!checkConstraintsLetterBasedAssignment(tempSolution, curr_category, temp_letter, sortedSpotList.get(index).getSpotNumber())){
+					flag = false;
+					break;
 				}
-
-				newTempSolution[index] = temp_letter;
-
-				letterBasedAssignment(newTempSolution, ((index + 1) % sortedLetterList.size()) , sortedLetterList); // Recursive search to next category with current solution
 			}
 
-			else
+			if(!flag) break;
+
+			char[] newTempSolution = new char[tempSolution.length];
+
+			// Creates new solution to pass recursively
+			for(int i = 0; i < tempSolution.length ; i++)
 			{
-				continue; // Skips current letter since it doesn't work
-			} 
+				newTempSolution[i] = tempSolution[i];
+			}
+
+			newTempSolution[index] = temp_letter;
+
+			letterBasedAssignment(newTempSolution, ((index + 1) % sortedSpotList.size()) , sortedSpotList); // Recursive search to next category with current solution
+		
 		}
 	}
 
@@ -400,9 +408,21 @@ public class Puzzle
 	* It will check the categories to see if it fits in and
 	* if the space is blank or has the matching letter
 	*/
-	public static boolean checkConstraintsLetterBasedAssignment(char[] tempSolution, ArrayList<Category> categories, char letter)
+	public static boolean checkConstraintsLetterBasedAssignment(char[] tempSolution, Category category, char letter, int spot)
 	{
-		// NEEDS IMPLIMENTED
+		ArrayList<Integer> positions = category.getPositions();
+		for(String word : category.getWordList()){
+			if((tempSolution[positions.get(0)] == word.charAt(0) || tempSolution[positions.get(0)] == ' ') 
+				&& (tempSolution[positions.get(0)] == word.charAt(0) || tempSolution[positions.get(0)] == ' ') 
+					&& (tempSolution[positions.get(0)] == word.charAt(0) || tempSolution[positions.get(0)] == ' ')){
+				return true;
+			}
+			else{
+				continue;
+			}
+		}
+
+		return false;
 	}
 
 	/** 
@@ -410,15 +430,14 @@ public class Puzzle
 	*/
 	public void getSpotsFromCategories()
 	{
-		Spot spot;
 		ArrayList<Integer> positions;
 
 		// Go through positions to initilize spots
 		for(int i = 1 ; i < length + 1 ; i++){
 
 			// Make new spot with number
-			spot = new Spot();
-			spot.setSpotNumber(i);
+			Spot newSpot = new Spot();
+			newSpot.setSpotNumber(i);
 
 			// Look through categories and check whether
 			// it has a letter that matches the position
@@ -433,11 +452,11 @@ public class Puzzle
 
 						// Add that letter to this position
 						for(String word : curr_category.getWordList()){
-							spot.addLetter(word.chaAt(j));
+							newSpot.addLetter(word.charAt(j));
 						}
 
 						// Add category to spot
-						spot.addCategory(curr_category);
+						newSpot.addCategory(curr_category);
 					}
 
 					// If the position is greater than our spot, break
@@ -446,7 +465,7 @@ public class Puzzle
 			}
 
 			// Add spot to list
-			spotList.add(spot);
+			this.spotList.add(newSpot); // NULL POINTER EXCEPTION
 		}
 
 	}	
@@ -459,9 +478,9 @@ public class Puzzle
 	 */
 	public static void main(String [] args)
 	{
-		Puzzle myPuzzle = new Puzzle("src/mp2/puzzle4.txt");
+		Puzzle myPuzzle = new Puzzle("src/mp2/puzzle1.txt");
 		//myPuzzle.testPuzzleParameters();
-		myPuzzle.runWordBasedAssignment();
+		myPuzzle.runLetterBasedAssignment();
 	}
 	
 	
