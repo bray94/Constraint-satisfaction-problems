@@ -335,16 +335,29 @@ public class Puzzle
 		{
 			boolean flag = true;
 
+
+			System.out.println(new String(tempSolution) + "       Current Letter: " 
+				+ temp_letter + "     Current position: " + sortedSpotList.get(index).getSpotNumber());
+
+
+			char[] constraintTempSolution = new char[tempSolution.length];
+
+			// Creates new solution to pass recursively
+			for(int i = 0; i < tempSolution.length ; i++)
+			{
+				constraintTempSolution[i] = tempSolution[i];
+			}
+
 			// Check if letter meets constraints
 			for(Category curr_category : categories){
 
-				if(!checkConstraintsLetterBasedAssignment(tempSolution, curr_category, temp_letter, sortedSpotList.get(index).getSpotNumber())){
+				if(!checkConstraintsLetterBasedAssignment(constraintTempSolution, curr_category, temp_letter, sortedSpotList.get(index).getSpotNumber())){
 					flag = false;
 					break;
 				}
 			}
 
-			if(!flag) break;
+			if(!flag) continue;
 
 			char[] newTempSolution = new char[tempSolution.length];
 
@@ -354,7 +367,7 @@ public class Puzzle
 				newTempSolution[i] = tempSolution[i];
 			}
 
-			newTempSolution[index] = temp_letter;
+			newTempSolution[sortedSpotList.get(index).getSpotNumber() - 1] = temp_letter;
 
 			letterBasedAssignment(newTempSolution, ((index + 1) % sortedSpotList.size()) , sortedSpotList); // Recursive search to next category with current solution
 		
@@ -410,11 +423,12 @@ public class Puzzle
 	*/
 	public static boolean checkConstraintsLetterBasedAssignment(char[] tempSolution, Category category, char letter, int spot)
 	{
+		tempSolution[spot-1] = letter;
 		ArrayList<Integer> positions = category.getPositions();
 		for(String word : category.getWordList()){
-			if((tempSolution[positions.get(0)] == word.charAt(0) || tempSolution[positions.get(0)] == ' ') 
-				&& (tempSolution[positions.get(0)] == word.charAt(0) || tempSolution[positions.get(0)] == ' ') 
-					&& (tempSolution[positions.get(0)] == word.charAt(0) || tempSolution[positions.get(0)] == ' ')){
+			if((tempSolution[positions.get(0) - 1] == word.charAt(0) || tempSolution[positions.get(0) - 1] == ' ') 
+				&& (tempSolution[positions.get(1) - 1] == word.charAt(1) || tempSolution[positions.get(1) - 1] == ' ') 
+					&& (tempSolution[positions.get(2) - 1] == word.charAt(2) || tempSolution[positions.get(2) - 1] == ' ')){
 				return true;
 			}
 			else{
@@ -431,6 +445,7 @@ public class Puzzle
 	public void getSpotsFromCategories()
 	{
 		ArrayList<Integer> positions;
+		spotList = new ArrayList<Spot>();
 
 		// Go through positions to initilize spots
 		for(int i = 1 ; i < length + 1 ; i++){
