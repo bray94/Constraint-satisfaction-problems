@@ -154,15 +154,15 @@ public class Puzzle
 		ArrayList<Category> sortedCategoryList = sortCategoryList();
 
 
-		wordBasedAssignment(tempSolution, 0 , sortedCategoryList);
+		wordBasedAssignment(tempSolution, 0 , sortedCategoryList , "");
 
-		System.out.println("Solution Size: " + solution.size());
+		//System.out.println("Solution Size: " + solution.size());
 		
 		//Print the Solution
-		for(int i = 0 ; i < solution.size() ; i++)
-		{
-			System.out.println(solution.get(i));
-		}
+		//for(int i = 0 ; i < solution.size() ; i++)
+		//{
+		//	System.out.println(solution.get(i));
+		//}
 
 	}
 
@@ -170,12 +170,13 @@ public class Puzzle
 	/** 
 	* Runs recursive back-tracing algorithm for word based assignment
 	*/
-	public void wordBasedAssignment(char[] tempSolution, int index, ArrayList<Category> sortedCategoryList)
+	public void wordBasedAssignment(char[] tempSolution, int index, ArrayList<Category> sortedCategoryList, String buffer)
 	{	
 		// If solution doesn't contain any blank spaces, it is printed and returned up a level
 		if(!(new String(tempSolution).contains(" ")))
 		{
 			solution.add(new String(tempSolution));
+			System.out.printf("(found result: %s)" , new String(tempSolution));
 			return;
 		}
 
@@ -185,11 +186,7 @@ public class Puzzle
 		// Iterate through words in current category
 		for(String temp_word : sortedCategoryList.get(index).getWordList())
 		{
-		/*	
-		*	System.out.println(new String(tempSolution) + "       Current Word: " 
-		*		+ temp_word + "     Current positions: " + positions.get(0) + ", "
-		*			+ positions.get(1) + ", "+ positions.get(2));
-		*/ 
+		 
 
 			// Check if word meets constraints
 			if(checkConstraintsWordBasedAssignment(tempSolution, positions, temp_word))
@@ -207,7 +204,20 @@ public class Puzzle
 					newTempSolution[positions.get(i) - 1] = temp_word.charAt(i);
 				}
 
-				wordBasedAssignment(newTempSolution, ((index + 1) % sortedCategoryList.size()) , sortedCategoryList); // Recursive search to next category with current solution
+				
+				     if(index == 0)System.out.printf("\n%s " , temp_word);
+				else if(index == 1)System.out.printf("\n  %s " , temp_word);
+				else if(index == 2)System.out.printf("\n    %s " , temp_word);
+				else if(index == 3)System.out.printf("\n      %s " , temp_word);
+				else if(index == 4)System.out.printf("\n        %s " , temp_word);
+				else if(index == 5)System.out.printf("\n          %s " , temp_word);
+				else if(index == 6)System.out.printf("\n            %s " , temp_word);
+				else if(index == 7)System.out.printf("\n              %s " , temp_word);
+				else if(index == 8)System.out.printf("\n                %s " , temp_word);
+				else if(index == 9)System.out.printf("\n                  %s " , temp_word);
+
+
+				wordBasedAssignment(newTempSolution, ((index + 1) % sortedCategoryList.size()) , sortedCategoryList, buffer + "    "); // Recursive search to next category with current solution
 			}
 
 			else
@@ -300,7 +310,7 @@ public class Puzzle
 		ArrayList<Spot> sortedSpotList = sortSpotList();
 
 
-		letterBasedAssignment(tempSolution, 0 , sortedSpotList);
+		letterBasedAssignment(tempSolution, 0 , sortedSpotList, "");
 
 		System.out.println("Solution Size: " + solution.size());
 		
@@ -316,12 +326,13 @@ public class Puzzle
 	/** 
 	* Runs recursive back-tracing algorithm for letter based search
 	*/
-	public void letterBasedAssignment(char[] tempSolution, int index, ArrayList<Spot> sortedSpotList)
+	public void letterBasedAssignment(char[] tempSolution, int index, ArrayList<Spot> sortedSpotList , String buffer)
 	{	
 		// If solution doesn't contain any blank spaces, it is printed and returned up a level
 		if(!(new String(tempSolution).contains(" ")))
 		{
 			solution.add(new String(tempSolution));
+			System.out.printf("(found result: %s)" , new String(tempSolution));
 			return;
 		}
 
@@ -334,11 +345,6 @@ public class Puzzle
 		for(char temp_letter : sortedSpotList.get(index).getLetterList())
 		{
 			boolean flag = true;
-
-
-			System.out.println(new String(tempSolution) + "       Current Letter: " 
-				+ temp_letter + "     Current position: " + sortedSpotList.get(index).getSpotNumber());
-
 
 			char[] constraintTempSolution = new char[tempSolution.length];
 
@@ -369,7 +375,18 @@ public class Puzzle
 
 			newTempSolution[sortedSpotList.get(index).getSpotNumber() - 1] = temp_letter;
 
-			letterBasedAssignment(newTempSolution, ((index + 1) % sortedSpotList.size()) , sortedSpotList); // Recursive search to next category with current solution
+		         if(index == 0)System.out.printf("\n%s " , temp_letter);
+			else if(index == 1)System.out.printf("\n  %s " , temp_letter);
+			else if(index == 2)System.out.printf("\n    %s " , temp_letter);
+			else if(index == 3)System.out.printf("\n      %s " , temp_letter);
+			else if(index == 4)System.out.printf("\n        %s " , temp_letter);
+			else if(index == 5)System.out.printf("\n          %s " , temp_letter);
+			else if(index == 6)System.out.printf("\n            %s " , temp_letter);
+			else if(index == 7)System.out.printf("\n              %s " , temp_letter);
+			else if(index == 8)System.out.printf("\n                %s " , temp_letter);
+			else if(index == 9)System.out.printf("\n                  %s " , temp_letter);
+
+			letterBasedAssignment(newTempSolution, ((index + 1) % sortedSpotList.size()) , sortedSpotList , buffer + "   "); // Recursive search to next category with current solution
 		
 		}
 	}
@@ -493,7 +510,7 @@ public class Puzzle
 	 */
 	public static void main(String [] args)
 	{
-		Puzzle myPuzzle = new Puzzle("src/mp2/puzzle1.txt");
+		Puzzle myPuzzle = new Puzzle("src/mp2/puzzleExample.txt");
 		//myPuzzle.testPuzzleParameters();
 		myPuzzle.runLetterBasedAssignment();
 	}
