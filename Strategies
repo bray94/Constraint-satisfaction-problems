@@ -1,0 +1,14 @@
+package mp2;
+
+public class Strategies 
+{
+	public static void alphaBetaPruning()
+	{
+		
+	}
+	
+	public static void minimax()
+	{
+		
+	}
+}
