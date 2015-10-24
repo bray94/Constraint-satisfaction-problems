@@ -144,16 +144,20 @@ public class Puzzle
 	*/
 	public void runWordBasedAssignment()
 	{
+
+		// Create temporary solution
 		char[] tempSolution = new char[this.length];
 
+		// Set each spot to blank
 		for(int i = 0; i < this.length ; i++)
 		{
 			tempSolution[i] = ' ';
 		}
 
+		// Sort category list
 		ArrayList<Category> sortedCategoryList = sortCategoryList();
 
-
+		// Start the recursive baktracing algorithm
 		wordBasedAssignment(tempSolution, 0 , sortedCategoryList , "");
 
 		//System.out.println("Solution Size: " + solution.size());
@@ -193,6 +197,7 @@ public class Puzzle
 			{
 				char[] newTempSolution = new char[tempSolution.length];
 
+				// Copy in temporary solution to be passed in to the next recursive part
 				for(int i = 0; i < tempSolution.length ; i++)
 				{
 					newTempSolution[i] = tempSolution[i];
@@ -204,7 +209,8 @@ public class Puzzle
 					newTempSolution[positions.get(i) - 1] = temp_word.charAt(i);
 				}
 
-				
+
+					// If statements to print it out in a semi-template				
 				     if(index == 0)System.out.printf("\n%s " , temp_word);
 				else if(index == 1)System.out.printf("\n  %s " , temp_word);
 				else if(index == 2)System.out.printf("\n    %s " , temp_word);
@@ -216,7 +222,7 @@ public class Puzzle
 				else if(index == 8)System.out.printf("\n                %s " , temp_word);
 				else if(index == 9)System.out.printf("\n                  %s " , temp_word);
 
-
+				// Call recursive part
 				wordBasedAssignment(newTempSolution, ((index + 1) % sortedCategoryList.size()) , sortedCategoryList, buffer + "    "); // Recursive search to next category with current solution
 			}
 
@@ -237,7 +243,8 @@ public class Puzzle
 	{
 		int min = 0;
 		int counter = 0;
-		
+	
+
 		for (Category curr_category : categoryList)
 		{
 			if(curr_category.getNumWords() < categoryList.get(min).getNumWords())
@@ -262,6 +269,7 @@ public class Puzzle
 
 		int numberOfCategories = categoryList.size();
 
+		// goes through and finds the category with lowest words and removes it and adds to new list
 		for(int i = 0; i < numberOfCategories ; i++)
 		{
 			minimum = getCategoryWithLowestWords();
@@ -298,8 +306,10 @@ public class Puzzle
 	public void runLetterBasedAssignment()
 	{
 
+		// assigns the spots for each space in the puzzle from categories
 		getSpotsFromCategories();
 
+		// mkae temp solution to pass in to the function
 		char[] tempSolution = new char[this.length];
 
 		for(int i = 0; i < this.length ; i++)
@@ -309,25 +319,36 @@ public class Puzzle
 
 		ArrayList<Spot> sortedSpotList = sortSpotList();
 
+		// Sets up list forward checing will be ran on
+		ArrayList<ArrayList<Character>> forwardChecking = new ArrayList<ArrayList<Character>>();
 
-		letterBasedAssignment(tempSolution, 0 , sortedSpotList, "");
+		for(int i = 0; i < sortedSpotList.size() ; i++){
+			ArrayList<Character> inner = new ArrayList<Character>();
+			inner = sortedSpotList.get(i).getLetterList();
+			forwardChecking.add(inner);
 
-		System.out.println("Solution Size: " + solution.size());
-		
-		//Print the Solution
-		for(int i = 0 ; i < solution.size() ; i++)
-		{
-			System.out.println(solution.get(i));
 		}
 
+		// Calls recursive backtracing algorithm
+		letterBasedAssignment(tempSolution, 0 , sortedSpotList, forwardChecking);
+
+	
 	}
 
 
 	/** 
 	* Runs recursive back-tracing algorithm for letter based search
 	*/
-	public void letterBasedAssignment(char[] tempSolution, int index, ArrayList<Spot> sortedSpotList , String buffer)
+	public void letterBasedAssignment(char[] tempSolution, int index, ArrayList<Spot> sortedSpotList , ArrayList<ArrayList<Character>> forwardChecking )
 	{	
+
+		// Checks if any remaining spots in forward checking are blank and if so returns
+		for(ArrayList<Character> list : forwardChecking){
+			if(list.size() == 0) 
+				{
+					return;
+				}
+		}
 		// If solution doesn't contain any blank spaces, it is printed and returned up a level
 		if(!(new String(tempSolution).contains(" ")))
 		{
@@ -342,8 +363,9 @@ public class Puzzle
 		ArrayList<Category> categories = sortedSpotList.get(index).getCategories();
 
 		// Iterate through letters in current position
-		for(char temp_letter : sortedSpotList.get(index).getLetterList())
+		for(char temp_letter : forwardChecking.get(index))
 		{
+			
 			boolean flag = true;
 
 			char[] constraintTempSolution = new char[tempSolution.length];
@@ -365,6 +387,24 @@ public class Puzzle
 
 			if(!flag) continue;
 
+			// Sets temp forward checking to be passed recursively
+			ArrayList<ArrayList<Character>> tempForwardChecking = new ArrayList<ArrayList<Character>>();
+		
+
+			for(ArrayList<Character> list : forwardChecking)
+			{
+				ArrayList<Character> inner = new ArrayList<Character>();
+				for(char letter : list)
+				{
+					inner.add(new Character(letter));
+				}
+				tempForwardChecking.add(inner);
+			}
+
+
+			// Forward checks and elimates spots that don't work with the current letter
+			forwardChecking(tempForwardChecking, sortedSpotList, temp_letter, index);
+
 			char[] newTempSolution = new char[tempSolution.length];
 
 			// Creates new solution to pass recursively
@@ -373,24 +413,98 @@ public class Puzzle
 				newTempSolution[i] = tempSolution[i];
 			}
 
+			// adds current letter to solution
 			newTempSolution[sortedSpotList.get(index).getSpotNumber() - 1] = temp_letter;
 
 		         if(index == 0)System.out.printf("\n%s " , temp_letter);
-			else if(index == 1)System.out.printf("\n  %s " , temp_letter);
-			else if(index == 2)System.out.printf("\n    %s " , temp_letter);
-			else if(index == 3)System.out.printf("\n      %s " , temp_letter);
-			else if(index == 4)System.out.printf("\n        %s " , temp_letter);
-			else if(index == 5)System.out.printf("\n          %s " , temp_letter);
-			else if(index == 6)System.out.printf("\n            %s " , temp_letter);
-			else if(index == 7)System.out.printf("\n              %s " , temp_letter);
-			else if(index == 8)System.out.printf("\n                %s " , temp_letter);
-			else if(index == 9)System.out.printf("\n                  %s " , temp_letter);
+		    else if(index == 1)System.out.printf("\n  -> %s " , temp_letter);
+			else if(index == 2)System.out.printf("\n       -> %s " , temp_letter);
+			else if(index == 3)System.out.printf("\n            -> %s " , temp_letter);
+			else if(index == 4)System.out.printf("\n                 -> %s " , temp_letter);
+			else if(index == 5)System.out.printf("\n                      -> %s " , temp_letter);
+			else if(index == 6)System.out.printf("\n                           -> %s " , temp_letter);
+			else if(index == 7)System.out.printf("\n                                -> %s " , temp_letter);
+			else if(index == 8)System.out.printf("\n                                     -> %s " , temp_letter);
+			else if(index == 9)System.out.printf("\n                                          -> %s " , temp_letter);
 
-			letterBasedAssignment(newTempSolution, ((index + 1) % sortedSpotList.size()) , sortedSpotList , buffer + "   "); // Recursive search to next category with current solution
-		
+			// Recursively calls the back tracing algorithm
+			letterBasedAssignment(newTempSolution, ((index + 1) % sortedSpotList.size()) , sortedSpotList , tempForwardChecking); // Recursive search to next category with current solution
+
 		}
 	}
 
+	/**
+	 * Forward checks to find errors before
+	 * we try them
+	 */
+	public void forwardChecking(ArrayList<ArrayList<Character>> tempForwardChecking, ArrayList<Spot> sortedSpotList , char letter, int index)
+	{
+		int spot = sortedSpotList.get(index).getSpotNumber();
+		ArrayList<Category> categories = sortedSpotList.get(index).getCategories();
+		
+		// Iterates through categories in spot
+		for(Category category : categories){
+			int placeInWord = 0;
+			ArrayList<String> words = new ArrayList<String>();
+			ArrayList<Integer> positions = category.getPositions();
+			int j = 0;
+
+			// Iterates through positions in current position
+			for(int place : category.getPositions())
+			{
+				// If the position equals the current spot we are in, it saves the place of the position so we know what 
+				// letter in the words for that category correspond to this spot. first letter, second, etc.
+				if(place == spot) 
+				{
+					placeInWord = j;
+					break;
+				}
+				j++;
+
+			}
+
+			// Iterates through words for va=category, if the letter matches the letter we've chosen for this 
+			// spot the word is added to a list of possible words
+			for(String word : category.getWordList()){
+					if(letter == word.charAt(placeInWord)) words.add(word);
+			}
+
+			// Iterate through positions
+			for(int position = 0 ; position < 3 ; position ++)
+			{	
+				// If the position matches the current spot we skip, we've already elimanted every other letter
+				if(positions.get(position) == spot) continue;
+
+				// Sort through spot list to find it's index that matches the position of category
+				for(int i = 0 ; i < sortedSpotList.size() ; i ++)
+				{
+					if(sortedSpotList.get(i).getSpotNumber() == positions.get(position))
+					{
+						// uses that index we found to sort through letters at that spot
+						for(int x = tempForwardChecking.get(i).size() - 1 ;  x > -1 ; x--)
+						{	
+							boolean flag = false;
+							for(String word : words)
+							{
+								// If letter in spot doesn't match the possible letters for matching words it's removed
+								if(word.charAt(position) == (tempForwardChecking.get(i)).get(x)) 
+								{
+									flag = true;
+									break;
+								}
+							}
+								
+							if(!flag) tempForwardChecking.get(i).remove(x);
+								
+						}
+						break;
+					}
+				}
+			}
+		}
+
+
+	}
 	/**
 	 * Finds the spot with the least number of letters left
 	 * Returns the index of this spot in the spotList
@@ -442,7 +556,10 @@ public class Puzzle
 	{
 		tempSolution[spot-1] = letter;
 		ArrayList<Integer> positions = category.getPositions();
-		for(String word : category.getWordList()){
+		ArrayList<String> words = category.getWordList();
+
+		
+		for(String word: category.getWordList()){
 			if((tempSolution[positions.get(0) - 1] == word.charAt(0) || tempSolution[positions.get(0) - 1] == ' ') 
 				&& (tempSolution[positions.get(1) - 1] == word.charAt(1) || tempSolution[positions.get(1) - 1] == ' ') 
 					&& (tempSolution[positions.get(2) - 1] == word.charAt(2) || tempSolution[positions.get(2) - 1] == ' ')){
@@ -510,9 +627,10 @@ public class Puzzle
 	 */
 	public static void main(String [] args)
 	{
-		Puzzle myPuzzle = new Puzzle("src/mp2/puzzleExample.txt");
+		Puzzle myPuzzle = new Puzzle("src/mp2/puzzle4.txt");
 		//myPuzzle.testPuzzleParameters();
 		myPuzzle.runLetterBasedAssignment();
+
 	}
 	
 	
