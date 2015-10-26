@@ -7,6 +7,8 @@ import java.util.ArrayList;
 public class Points{
 	private ArrayList<Points> neighbors;
 
+
+
 	public void addNeighbor(Points neighbor){
 		neighbors.add(neighbor);
 	}
@@ -15,9 +17,22 @@ public class Points{
 		return neighbors;
 	}
 
+	public ArrayList<Points> stillAvailable;
+
+	public void addStillAvailable(ArrayList<Points> points){
+		stillAvailable = new ArrayList<Points>();
+
+		for(Points point : points){
+			if(this == point) continue;
+			else stillAvailable.add(point);
+		}
+	}
+
+
 
 
 	private int color;
+	ArrayList<Integer> possible;
 
 	public void setColor(int i){
 		color = i;
@@ -35,6 +50,14 @@ public class Points{
 
 	public void setX(double x){
 		neighbors = new ArrayList<Points>();
+
+		possible = new ArrayList<Integer>();
+		for(int i = 1; i < 5 ; i++){
+			possible.add(i);
+		}
+
+		color = 0;
+
 		this.x = x;;
 	}
 
